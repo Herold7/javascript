@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+        crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+
+<body class="container">
+
+    <script>
+        //Calcul du nombre de jours
+        let start = new Date("2022-01-01");
+        let date1 = start.getTime(); //renvoie temps UNIX en ms
+        let date2 = Date.now();
+        let nbJours = Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24));
+        console.log(nbJours);
+
+    </script>
+
+
+    <div class="jumbotron">
+        <h1 class="display-4">Espace abonnés</h1>
+        <p class="lead">Cet espace est réservé au greta 92. Il est en place depuis
+            <script> document.write(nbJours)</script> jours. Il compte aujourd'hui
+            <script> </script> abonnés
+        </p>
+        <hr class="my-4">
+        <p>Cliquez ici pour se connecter </p>
+        <button class="btn btn-success" id="btnLogin">Ajouter un stagiaire</button>
+        <button class="btn btn-success" id="btnTrie">Trie par ordre alphabétique</button>
+    </div>
+    <section class="d-flex flex-wrap" id="affichage">
+        <script>
+            //constiable globale
+            tabPeople = [];
+            //Attache les elements du DOM au gestionnaire de events
+            let btn = document.getElementById("btnLogin");
+            btn.addEventListener("click", () => {
+                tabPeople = addPeople(tabPeople); //ajout
+                printCard(tabPeople);//affiche les objets en cards
+            });
+
+            let btnTrie = document.getElementById('btnTrie');
+            btnTrie.addEventListener("click", () => {
+                trier(tabPeople);
+            });
+            let affiche = document.getElementById("affichage");
+            affiche.addEventListener("mouseover", () => {
+                manip(tabPeople); //objectif : event sur le bouton modif/suppr
+
+            });
+
+
+            //Déclaration des fonctions
+
+            function addPeople(tab) { // Fonction d'ajout d'abonnés
+                let name = prompt("Nom ?");
+                let sexe = prompt("Sexe (masculin ou feminin) ?");
+                let dob = prompt("Date de naissance (jj/mm/aaaa) ?");
+
+                let stagiaire = {};
+                stagiaire["name"] = name;
+                stagiaire["sexe"] = sexe;
+                stagiaire["dob"] = dob;
+                tab.push(stagiaire);
+                return tab;
+
+            }
+
+            function printCard(tab) { // Fonction d'ajout d'une card
+                let affiche = document.getElementById("affichage");
+                let cardhtml = "";
+                for (let i = 0; i < tab.length; i++) {
+                    cardhtml += `<div class="card m-3" style="width: 15rem;">
+                    <img src="${(tab[i].sexe == "masculin") ? "boys" : "girls"}.jpg" alt="b">
+                    <div class="card-body">
+                    <h5 class="card-title">${tab[i].name}</h5>
+                    <p><strong>Sexe : ${tab[i].sexe}</strong></p>
+                    <p><strong>Age : ${tab[i].dob}</strong></p>
+                    <button type="button" class="btn btn-secondary">Modifier</button>
+                    <button type="button" class="btn btn-danger">Supprimer</button>
+                    </div>
+                    </div>`;
+                }
+                affiche.innerHTML = cardhtml;
+            }
+
+            function trier(tab) { // Fonction de trie des cards par ordre alphabétique prenom
+                let tabTrie = tab.sort((a, b) => (a.name > b.name ? 1 : -1));
+                printCard(tabTrie);
+            }
+
+            //fonction manip positionne des events sur les boutons modif et suppr
+            function manip(tab) {
+                let btnModif = document.getElementsByClassName("btn btn-secondary");
+                let btnSuppr = document.getElementsByClassName("btn btn-danger");
+                for (let i = 0; i < btnModif.length; i++) {
+                    btnModif[i].addEventListener("click", (e) => {
+                        tabPeople = modif(tabPeople, e);
+                        printCard(tabPeople);
+
+                    });
+                    btnSuppr[i].addEventListener("click", (e) => {
+                        tabPeople = deleteCard(e, tabPeople);
+                        printCard(tabPeople);
+                    });
+                }
+            }
+            function deleteCard(e, tab) {
+                let cardName = e.target.offsetParent.childNodes[3].childNodes[1].innerHTML;
+                isLargeNumber = (element) => element.name == cardName;
+                let myIndex = tab.findIndex(isLargeNumber);
+                console.log(myIndex);
+                tab.splice(myIndex, 1);
+                return tab;
+            }
+            function modif(tab, e) {
+                ;
+                //console.log(e.target);//la cible de mon click
+                //console.log(e);
+                let cardName = e.target.offsetParent.childNodes[3].childNodes[1].innerHTML;
+                for (let i = 0; i < tab.length; i++) {
+                    if (cardName == tab[i].name) {
+                        Object.defineProperty(tab[i], 'name', { value: prompt('changer le nom ?') });//fonction afin de modifier objet JSON
+                        Object.defineProperty(tab[i], 'sexe', { value: prompt('changer le sexe ?') });
+                        Object.defineProperty(tab[i], 'dob', { value: prompt('changer la date ?') });
+                    }
+                }
+                return tab;
+            }
+
+        </script>
+
+    </section>
+</body>
+
+</html>
